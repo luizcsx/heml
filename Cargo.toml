@@ -1,6 +1,8 @@
 [package]
 name = "heml"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
+scraper = "0.17.1" 
+regex = "1.10.2"
