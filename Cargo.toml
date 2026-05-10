@@ -1,7 +1,8 @@
 [package]
 name = "heml"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
 regex = "1.10.2"
+notify = "6.1.1"
