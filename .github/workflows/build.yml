@@ -2,20 +2,25 @@ name: HyperExtension Markup Language
 
 on: [push]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   release:
+    name: Compile Windows Binary
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Install Rust
+      - name: Install Stable Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build HEML
         run: cargo build --release
 
-      - name: Upload HEML Binary
+      - name: Archive Production Binary
         uses: actions/upload-artifact@v4
         with:
-          name: heml-windows-binary
+          name: heml-v0.1.0-windows-x64
           path: target/release/heml.exe
