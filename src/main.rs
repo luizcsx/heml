@@ -2,6 +2,10 @@ mod compiler;
 mod setup;
 
 use std::env;
+use std::path::Path;
+use std::time::Duration;
+use notify::{Watcher, RecursiveMode, watcher};
+use std::sync::mpsc::channel;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -14,30 +18,43 @@ fn main() {
     match args[1].as_str() {
         "setup" => setup::run_setup(),
         "build" => {
-            if args.len() < 3 {
-                println!("\x1b[31m[ERROR] Source parameter missing. Expected: heml build <filename>\x1b[0m");
-                return;
-            }
+            if args.len() < 3 { return; }
             compiler::run_build(&args[2]);
+        },
+        "watch" => {
+            if args.len() < 3 { return; }
+            run_watch(&args[2]);
         },
         _ => print_hud(),
     }
 }
 
+fn run_watch(file: &str) {
+    println!("\x1b[33m[WATCH] Monitoring {}... (Press Ctrl+C to stop)\x1b[0m", file);
+    
+    let (tx, rx) = channel();
+    let mut watcher = watcher(tx, Duration::from_millis(500)).unwrap();
+    
+    watcher.watch(Path::new("."), RecursiveMode::Recursive).unwrap();
+
+    loop {
+        match rx.recv() {
+            Ok(_) => {
+                compiler::run_build(file);
+            },
+            Err(e) => println!("Watch error: {:?}", e),
+        }
+    }
+}
+
 fn print_hud() {
-    // Printing a Clean, Professional ASCII Header
-    println!("\x1b[36m"); // Cyan Color
+    println!("\x1b[36m");
     println!(r#"
-    #################################################
-    #                                               #
-    #   HEML ENGINE | CORE SYSTEM v0.1.0            #
-    #   High-Performance Legacy Transpiler          #
-    #                                               #
-    #################################################
+    -•- HyperExtension Markup Language -•-
+             version v0.2.0.
     "#);
-    println!("\x1b[0m"); // Reset Color
-    println!("  OPERATIONAL COMMANDS:");
-    println!("  \x1b[33msetup\x1b[0m           Initialize system environment");
-    println!("  \x1b[33mbuild [file]\x1b[0m    Compile HEML source to HTML");
-    println!("\n  Status: Awaiting Command...");
+    println!("\x1b[0m  COMMANDS:");
+    println!("  setup           Initialize folders");
+    println!("  build [file]    Single compilation");
+    println!("  watch [file]    Real-time auto-build");
 }
