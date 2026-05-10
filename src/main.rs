@@ -50,8 +50,10 @@ fn run_watch(file: &str) {
 fn print_hud() {
     println!("\x1b[36m");
     println!(r#"
-    -•- HyperExtension Markup Language -•-
-             version v0.2.0.
+    #################################################
+    #   HEML ENGINE | v0.2.0                        #
+    #   The Real-Time Legacy Builder                #
+    #################################################
     "#);
     println!("\x1b[0m  COMMANDS:");
     println!("  setup           Initialize folders");
